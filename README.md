@@ -1,4 +1,4 @@
-# I.Analisis Sentimen Artikel Berita Menggunakan IndoBERT
+# I. Analisis Sentimen Artikel Berita Menggunakan IndoBERT
 
 ## Deskripsi
 
