@@ -49,7 +49,7 @@ pip install selenium beautifulsoup4 requests pandas transformers torch matplotli
 
 ## 🚀 Cara Menjalankan
 
-### 📰 Kode 1 — `NewsScraper.py` (Scraping Artikel Berita)
+### Kode 1 — `NewsScraper.py` (Scraping Artikel Berita)
 
 **Fungsi:** Mengambil artikel dari Kompas.id tentang Rupiah Rp18.000, melakukan preprocessing, analisis sentimen per kalimat dengan RoBERTa, dan ekstrak keyword utama.
 
@@ -72,7 +72,7 @@ Scraping URL Kompas.id → Preprocessing teks → Analisis sentimen (RoBERTa) �
 
 ---
 
-### 📸 Kode 2 — `instagram_scraper.py` (Scraping Komentar + Keyword)
+### Kode 2 — `instagram_scraper.py` (Scraping Komentar + Keyword)
 
 **Fungsi:** Login ke Instagram, scroll dan ambil semua komentar dari postingan terkait Dollar Rp18.000, lalu hitung frekuensi keyword per kategori.
 
@@ -111,7 +111,7 @@ python instagram_scraper.py
 
 ---
 
-### 🤖 Kode 3 — `sentiment.py` (Scraping + Analisis Sentimen IndoBERT)
+### Kode 3 — `sentiment.py` (Scraping + Analisis Sentimen IndoBERT)
 
 **Fungsi:** Gabungan scraping Instagram dan analisis sentimen penuh menggunakan model **IndoBERT** (`mdhugol/indonesia-bert-sentiment-classification`). Model akan otomatis didownload (~500MB) pada pertama kali dijalankan.
 
