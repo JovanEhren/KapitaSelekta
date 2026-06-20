@@ -1,156 +1,121 @@
-# I. Analisis Sentimen Artikel Berita Menggunakan IndoBERT
+# 📰 Script 1: Scraping Artikel Berita + Analisis Sentimen
 
-## Deskripsi
-
-Proyek ini merupakan implementasi **web scraping**, **preprocessing teks**, **analisis sentimen**, dan **analisis kata kunci** terhadap sebuah artikel berita berbahasa Indonesia. Artikel diambil secara otomatis dari **Kompas.id** dan kemudian diproses menggunakan model **Indonesian RoBERTa** untuk mengetahui sentimen setiap kalimat.
-
-Hasil analisis disimpan dalam bentuk dataset (.csv) serta divisualisasikan menggunakan grafik batang.
+Skrip ini mengambil artikel berita dari Kompas.id tentang **Rupiah tembus Rp18.000**, melakukan preprocessing teks, analisis sentimen menggunakan model IndoBERT/RoBERTa Bahasa Indonesia, serta mengekstrak keyword utama dari artikel.
 
 ---
 
-## Fitur
+## 📁 Output yang Dihasilkan
 
-* Scraping artikel berita dari Kompas.id
-* Pembersihan (preprocessing) teks
-* Penyimpanan dataset artikel ke file CSV
-* Pemisahan artikel menjadi beberapa kalimat
-* Analisis sentimen setiap kalimat menggunakan model IndoBERT
-* Visualisasi distribusi sentimen
-* Analisis kata kunci berdasarkan frekuensi kemunculan
-* Visualisasi 15 kata kunci yang paling sering muncul
+| File | Deskripsi |
+|------|-----------|
+| `artikel_berita.csv` | Judul dan isi artikel yang sudah dibersihkan |
+| `artikel_sentiment.csv` | Tiap kalimat artikel beserta label sentimennya |
+| `keyword_artikel.csv` | Top 15 keyword yang paling sering muncul |
 
 ---
 
-## Teknologi yang Digunakan
+## ⚙️ Requirements
 
-* Python 3
-* Requests
-* BeautifulSoup4
-* Pandas
-* Regular Expression (re)
-* Transformers (Hugging Face)
-* Matplotlib
-
----
-
-## Instalasi
-
-Clone repository:
+Pastikan Python sudah terinstall (versi **3.8+**), lalu install dependensi berikut:
 
 ```bash
-git clone https://github.com/username/nama-repository.git
-cd nama-repository
+pip install requests beautifulsoup4 pandas transformers matplotlib torch
 ```
 
-Install seluruh library yang dibutuhkan:
+> **Catatan:** Model `w11wo/indonesian-roberta-base-sentiment-classifier` akan otomatis diunduh dari Hugging Face saat pertama kali dijalankan (~500MB). Pastikan koneksi internet stabil.
+
+---
+
+## 🚀 Cara Menjalankan
+
+### 1. Clone atau download file skrip
 
 ```bash
-pip install requests beautifulsoup4 pandas matplotlib transformers torch
+git clone https://github.com/username/nama-repo.git
+cd nama-repo
+```
+
+### 2. Jalankan skrip
+
+```bash
+python script1_artikel.py
+```
+
+### 3. Cek output
+
+Setelah selesai, file berikut akan muncul di folder yang sama:
+```
+artikel_berita.csv
+artikel_sentiment.csv
+keyword_artikel.csv
 ```
 
 ---
 
-## Alur Program
+## 🔄 Alur Kerja Skrip
 
-```text
-Artikel Berita
-      │
-      ▼
-Web Scraping
-      │
-      ▼
-Preprocessing Teks
-      │
-      ▼
-Penyimpanan Dataset
-      │
-      ▼
-Pemisahan Kalimat
-      │
-      ▼
-Analisis Sentimen
-      │
-      ▼
-Visualisasi Sentimen
-      │
-      ▼
-Analisis Kata Kunci
-      │
-      ▼
-Visualisasi Keyword
+```
+URL Artikel Kompas.id
+        ↓
+  Scraping HTML (requests + BeautifulSoup)
+        ↓
+  Ekstrak Judul & Isi Artikel
+        ↓
+  Preprocessing (clean_text)
+  - Lowercase
+  - Hapus URL & karakter non-huruf
+  - Normalisasi spasi
+        ↓
+  Simpan → artikel_berita.csv
+        ↓
+  Pecah menjadi kalimat (split by .!?)
+        ↓
+  Sentiment Analysis per kalimat
+  (model: indonesian-roberta-base-sentiment-classifier)
+        ↓
+  Simpan → artikel_sentiment.csv
+        ↓
+  Visualisasi distribusi sentimen (bar chart)
+        ↓
+  Ekstrak Top 15 Keyword (tanpa stopwords)
+        ↓
+  Simpan → keyword_artikel.csv
+        ↓
+  Visualisasi keyword (bar chart)
 ```
 
 ---
 
-## Dataset yang Dihasilkan
+## 🧠 Model yang Digunakan
 
-Program akan menghasilkan tiga file dataset:
-
-| Nama File               | Deskripsi                                                                   |
-| ----------------------- | --------------------------------------------------------------------------- |
-| `artikel_berita.csv`    | Berisi judul dan isi artikel yang telah dibersihkan                         |
-| `artikel_sentiment.csv` | Berisi setiap kalimat beserta hasil klasifikasi sentimennya                 |
-| `keyword_artikel.csv`   | Berisi 15 kata kunci yang paling sering muncul beserta jumlah kemunculannya |
+| Properti | Detail |
+|----------|--------|
+| **Model** | `w11wo/indonesian-roberta-base-sentiment-classifier` |
+| **Sumber** | [Hugging Face](https://huggingface.co/w11wo/indonesian-roberta-base-sentiment-classifier) |
+| **Bahasa** | Bahasa Indonesia |
+| **Output label** | `positive`, `neutral`, `negative` |
+| **Input max token** | 512 token per kalimat |
 
 ---
 
-## Model Analisis Sentimen
+## ⚠️ Catatan Penting
 
-Analisis sentimen dilakukan menggunakan model:
+- **Artikel Kompas.id** sebagian kontennya berada di balik paywall. Skrip mengambil konten yang tersedia secara publik. Jika konten tidak lengkap, pertimbangkan untuk mengganti URL dengan sumber berita lain yang open-access (seperti Detik, Tempo, Cnnindonesia).
+- Jika ingin mengganti artikel, cukup ubah variabel `url` di baris awal skrip:
+  ```python
+  url = "https://url-artikel-baru.com/..."
+  ```
+- Proses sentimen bisa memakan waktu **2–10 menit** tergantung panjang artikel dan spesifikasi komputer.
+
+---
+
+## 🗂️ Struktur Folder
 
 ```
-w11wo/indonesian-roberta-base-sentiment-classifier
+📂 project/
+├── script1_artikel.py       ← Skrip utama
+├── artikel_berita.csv       ← Output: isi artikel
+├── artikel_sentiment.csv    ← Output: sentimen per kalimat
+├── keyword_artikel.csv      ← Output: top keyword
+└── README_script1.md        ← Dokumentasi ini
 ```
-
-Model ini mampu mengklasifikasikan setiap kalimat ke dalam kategori sentimen seperti:
-
-* Positif
-* Netral
-* Negatif
-
----
-
-## Hasil Program
-
-Setelah program dijalankan, akan dihasilkan:
-
-1. Dataset artikel (`artikel_berita.csv`)
-2. Dataset hasil analisis sentimen (`artikel_sentiment.csv`)
-3. Dataset kata kunci (`keyword_artikel.csv`)
-4. Grafik distribusi sentimen
-5. Grafik 15 kata kunci yang paling sering muncul
-
----
-
-## Contoh Proses
-
-Input:
-
-* Artikel berita mengenai nilai tukar Rupiah yang mencapai Rp18.000 terhadap Dolar AS.
-
-Output:
-
-* Artikel yang telah dibersihkan.
-* Dataset hasil analisis sentimen setiap kalimat.
-* Dataset kata kunci.
-* Grafik distribusi sentimen.
-* Grafik frekuensi kata kunci.
-
----
-
-## Pengembangan Selanjutnya
-
-Beberapa pengembangan yang dapat dilakukan pada proyek ini antara lain:
-
-* Mendukung scraping banyak artikel sekaligus.
-* Menambahkan visualisasi *Word Cloud*.
-* Membandingkan sentimen dari beberapa portal berita.
-* Menambahkan analisis topik (*Topic Modeling*).
-* Menambahkan *Named Entity Recognition* (NER).
-* Mengembangkan antarmuka berbasis Streamlit atau Flask agar dapat digunakan secara interaktif.
-
----
-
-## Lisensi
-
-Proyek ini dibuat untuk keperluan pembelajaran, penelitian, dan pengembangan analisis sentimen terhadap artikel berita berbahasa Indonesia.
