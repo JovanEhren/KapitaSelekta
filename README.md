@@ -45,12 +45,6 @@ pip install selenium beautifulsoup4 requests pandas transformers torch matplotli
 > pip install torch --index-url https://download.pytorch.org/whl/cu118
 > ```
 
-### 3. Setup ChromeDriver
-
-- Download ChromeDriver dari: https://chromedriver.chromium.org/downloads
-- Sesuaikan versi dengan Chrome yang terinstall (`chrome://version/`)
-- Tambahkan ChromeDriver ke PATH sistem, atau letakkan di folder proyek
-
 ---
 
 ## 🚀 Cara Menjalankan
