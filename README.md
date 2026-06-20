@@ -1,121 +1,181 @@
-# 📰 Script 1: Scraping Artikel Berita + Analisis Sentimen
+# 📊 KapitaSelekta — Analisis Sentimen Dollar Rp18.000
 
-Skrip ini mengambil artikel berita dari Kompas.id tentang **Rupiah tembus Rp18.000**, melakukan preprocessing teks, analisis sentimen menggunakan model IndoBERT/RoBERTa Bahasa Indonesia, serta mengekstrak keyword utama dari artikel.
-
----
-
-## 📁 Output yang Dihasilkan
-
-| File | Deskripsi |
-|------|-----------|
-| `artikel_berita.csv` | Judul dan isi artikel yang sudah dibersihkan |
-| `artikel_sentiment.csv` | Tiap kalimat artikel beserta label sentimennya |
-| `keyword_artikel.csv` | Top 15 keyword yang paling sering muncul |
+> **Misi:** Membandingkan narasi media massa dengan opini publik Instagram terkait pelemahan Rupiah tembus Rp18.000 menggunakan NLP berbasis IndoBERT.
 
 ---
 
-## ⚙️ Requirements
+## 📁 Struktur Repository
 
-Pastikan Python sudah terinstall (versi **3.8+**), lalu install dependensi berikut:
-
-```bash
-pip install requests beautifulsoup4 pandas transformers matplotlib torch
+```
+KapitaSelekta/
+├── NewsScraper.py          # Kode 1 — Scraping artikel berita + analisis sentimen
+├── instagram_scraper.py    # Kode 2 — Scraping komentar Instagram + keyword
+├── sentiment.py            # Kode 3 — Scraping Instagram + analisis sentimen IndoBERT
+├── CSV/
+│   ├── artikel_berita.csv
+│   ├── artikel_sentiment.csv
+│   ├── keyword_artikel.csv
+│   ├── comments.csv
+│   ├── keyword_count.csv
+│   └── sentiment_results.csv
+├── Chart/
+│   ├── keyword_chart.png
+│   ├── sentiment_pie.png
+│   └── sentiment_bar.png
+└── README.md
 ```
 
-> **Catatan:** Model `w11wo/indonesian-roberta-base-sentiment-classifier` akan otomatis diunduh dari Hugging Face saat pertama kali dijalankan (~500MB). Pastikan koneksi internet stabil.
+## 🔧 Instalasi
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/JovanEhren/KapitaSelekta.git
+cd KapitaSelekta
+```
+
+### 2. Install Dependensi
+
+```bash
+pip install selenium beautifulsoup4 requests pandas transformers torch matplotlib
+```
+
+> **Catatan:** Untuk GPU support (opsional, mempercepat analisis sentimen):
+> ```bash
+> pip install torch --index-url https://download.pytorch.org/whl/cu118
+> ```
+
+### 3. Setup ChromeDriver
+
+- Download ChromeDriver dari: https://chromedriver.chromium.org/downloads
+- Sesuaikan versi dengan Chrome yang terinstall (`chrome://version/`)
+- Tambahkan ChromeDriver ke PATH sistem, atau letakkan di folder proyek
 
 ---
 
 ## 🚀 Cara Menjalankan
 
-### 1. Clone atau download file skrip
+### 📰 Kode 1 — `NewsScraper.py` (Scraping Artikel Berita)
+
+**Fungsi:** Mengambil artikel dari Kompas.id tentang Rupiah Rp18.000, melakukan preprocessing, analisis sentimen per kalimat dengan RoBERTa, dan ekstrak keyword utama.
 
 ```bash
-git clone https://github.com/username/nama-repo.git
-cd nama-repo
+python NewsScraper.py
 ```
 
-### 2. Jalankan skrip
+**Output yang dihasilkan:**
+
+| File | Isi |
+|------|-----|
+| `artikel_berita.csv` | Judul + isi artikel lengkap |
+| `artikel_sentiment.csv` | Sentimen per kalimat artikel |
+| `keyword_artikel.csv` | Top 15 keyword terbanyak |
+
+**Alur proses:**
+```
+Scraping URL Kompas.id → Preprocessing teks → Analisis sentimen (RoBERTa) → Ekstrak keyword → Simpan CSV + tampilkan chart
+```
+
+---
+
+### 📸 Kode 2 — `instagram_scraper.py` (Scraping Komentar + Keyword)
+
+**Fungsi:** Login ke Instagram, scroll dan ambil semua komentar dari postingan terkait Dollar Rp18.000, lalu hitung frekuensi keyword per kategori.
+
+**Sebelum menjalankan**, pastikan konfigurasi di bagian atas file sudah diisi:
+
+```python
+USERNAME  = 'username_instagram_anda'
+PASSWORD  = 'password_instagram_anda'
+POST_URL  = 'https://www.instagram.com/p/DYWkER8kWRY/'
+```
 
 ```bash
-python script1_artikel.py
+python instagram_scraper.py
 ```
 
-### 3. Cek output
+**Output yang dihasilkan:**
 
-Setelah selesai, file berikut akan muncul di folder yang sama:
+| File | Isi |
+|------|-----|
+| `comments.csv` | Semua komentar mentah yang berhasil di-scrape |
+| `keyword_count.csv` | Frekuensi keyword beserta kategorinya |
+| `keyword_chart.png` | Bar chart horizontal Top 20 keyword |
+
+**Kategori keyword yang dianalisis:**
+
+| Kategori | Contoh Keyword |
+|----------|---------------|
+| 🔵 Kurs & Rupiah | rupiah, dollar, kurs, 18.000 |
+| 🟢 Ekonomi | inflasi, resesi, investasi, IHSG |
+| 🟣 Pemerintah | prabowo, jokowi, bank indonesia |
+| 🟠 Dampak Masyarakat | harga, sembako, PHK, daya beli |
+| 🔴 Sentimen | khawatir, panik, buruk, takut |
+| 🟤 Isu Sosial | korupsi, pajak, konoha |
+
+> ⚠️ **Catatan:** Jika muncul CAPTCHA atau verifikasi 2FA saat login, selesaikan secara manual di browser yang terbuka, lalu tekan **Enter** di terminal untuk melanjutkan.
+
+---
+
+### 🤖 Kode 3 — `sentiment.py` (Scraping + Analisis Sentimen IndoBERT)
+
+**Fungsi:** Gabungan scraping Instagram dan analisis sentimen penuh menggunakan model **IndoBERT** (`mdhugol/indonesia-bert-sentiment-classification`). Model akan otomatis didownload (~500MB) pada pertama kali dijalankan.
+
+**Sebelum menjalankan**, isi konfigurasi di bagian atas file:
+
+```python
+USERNAME  = 'username_instagram_anda'
+PASSWORD  = 'password_instagram_anda'
+POST_URL  = 'https://www.instagram.com/p/DYWkER8kWRY/'
 ```
-artikel_berita.csv
-artikel_sentiment.csv
-keyword_artikel.csv
+
+```bash
+python sentiment.py
+```
+
+**Output yang dihasilkan:**
+
+| File | Isi |
+|------|-----|
+| `comments.csv` | Komentar valid (sudah difilter noise) |
+| `sentiment_results.csv` | Komentar + label sentimen + confidence score |
+| `sentiment_pie.png` | Pie chart distribusi Positif/Netral/Negatif |
+| `sentiment_bar.png` | Bar chart jumlah komentar & rata-rata confidence |
+
+**Label Sentimen:**
+
+| Label | Arti |
+|-------|------|
+| ✅ Positif | Komentar bersifat mendukung/optimis |
+| ⚪ Netral | Komentar bersifat informatif/deskriptif |
+| ❌ Negatif | Komentar bersifat kritik/pesimis/kekhawatiran |
+
+**Alur proses:**
+```
+Login Instagram → Scroll komentar → Filter noise → Analisis sentimen IndoBERT → Simpan CSV + chart
 ```
 
 ---
 
-## 🔄 Alur Kerja Skrip
+## 🔄 Urutan Menjalankan (Workflow Lengkap)
 
 ```
-URL Artikel Kompas.id
-        ↓
-  Scraping HTML (requests + BeautifulSoup)
-        ↓
-  Ekstrak Judul & Isi Artikel
-        ↓
-  Preprocessing (clean_text)
-  - Lowercase
-  - Hapus URL & karakter non-huruf
-  - Normalisasi spasi
-        ↓
-  Simpan → artikel_berita.csv
-        ↓
-  Pecah menjadi kalimat (split by .!?)
-        ↓
-  Sentiment Analysis per kalimat
-  (model: indonesian-roberta-base-sentiment-classifier)
-        ↓
-  Simpan → artikel_sentiment.csv
-        ↓
-  Visualisasi distribusi sentimen (bar chart)
-        ↓
-  Ekstrak Top 15 Keyword (tanpa stopwords)
-        ↓
-  Simpan → keyword_artikel.csv
-        ↓
-  Visualisasi keyword (bar chart)
+1. python NewsScraper.py          ← Analisis narasi media
+         ↓
+2. python instagram_scraper.py    ← Ambil opini publik + keyword
+         ↓
+3. python sentiment.py            ← Analisis sentimen opini publik
+         ↓
+   Bandingkan hasil keduanya → Identifikasi kesenjangan narasi
 ```
+
+## 👥 Tim
+
+**-Jovan Ehren(231712538)**
+**-Jovan Patra Purba (231712612)**
+
+**Repository:** [JovanEhren/KapitaSelekta](https://github.com/JovanEhren/KapitaSelekta)
 
 ---
 
-## 🧠 Model yang Digunakan
-
-| Properti | Detail |
-|----------|--------|
-| **Model** | `w11wo/indonesian-roberta-base-sentiment-classifier` |
-| **Sumber** | [Hugging Face](https://huggingface.co/w11wo/indonesian-roberta-base-sentiment-classifier) |
-| **Bahasa** | Bahasa Indonesia |
-| **Output label** | `positive`, `neutral`, `negative` |
-| **Input max token** | 512 token per kalimat |
-
----
-
-## ⚠️ Catatan Penting
-
-- **Artikel Kompas.id** sebagian kontennya berada di balik paywall. Skrip mengambil konten yang tersedia secara publik. Jika konten tidak lengkap, pertimbangkan untuk mengganti URL dengan sumber berita lain yang open-access (seperti Detik, Tempo, Cnnindonesia).
-- Jika ingin mengganti artikel, cukup ubah variabel `url` di baris awal skrip:
-  ```python
-  url = "https://url-artikel-baru.com/..."
-  ```
-- Proses sentimen bisa memakan waktu **2–10 menit** tergantung panjang artikel dan spesifikasi komputer.
-
----
-
-## 🗂️ Struktur Folder
-
-```
-📂 project/
-├── script1_artikel.py       ← Skrip utama
-├── artikel_berita.csv       ← Output: isi artikel
-├── artikel_sentiment.csv    ← Output: sentimen per kalimat
-├── keyword_artikel.csv      ← Output: top keyword
-└── README_script1.md        ← Dokumentasi ini
-```
+*Proyek ini dibuat untuk keperluan analisis kebijakan publik — membandingkan narasi media massa dengan opini publik di Instagram terkait pelemahan Rupiah Rp18.000.*
